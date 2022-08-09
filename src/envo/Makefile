@@ -188,7 +188,8 @@ $(ONT)-full.owl: $(SRC) $(OTHER_SRC)
 
 
 SUBSETS = envo-basic EnvO-Lite-GSC envoEmpo envoAstro envoPolar envoEmpo envoOmics envoCesab environmental_hazards \
-   biome-hierarchy astronomical-body-part-hierarchy material-hierarchy process-hierarchy envoPlastics
+   biome-hierarchy astronomical-body-part-hierarchy material-hierarchy process-hierarchy envo_test ncit_test \
+   
 
 SUBSET_ROOTS = $(patsubst %, subsets/%, $(SUBSETS))
 SUBSET_FILES = $(foreach n,$(SUBSET_ROOTS), $(foreach f,$(FORMATS_INCL_TSV), $(n).$(f)))
@@ -265,6 +266,23 @@ subsets/process-hierarchy.owl: envo.owl
 	  -a owl:versionInfo "$@ $(TODAY)" \
 	  --output $@
 .PRECIOUS: subsets/process-hierarchy.owl
+
+subsets/ncit_test.owl: ncit.owl
+	robot extract --method BOT \
+		--input $< \
+		--term-file ncit_sheet.txt \
+		--output $@
+.PRECIOUS: subsets/ncit_test.owl
+
+subsets/envo_test.owl: envo.owl
+	robot extract --method BOT \
+		--input $< \
+		--term-file envo_sheet.txt \
+	annotate --ontology-iri $(ONTBASE)/$@ \
+	  	--version-iri $(ONTBASE)/releases/$(TODAY)/$@ \
+	  	-a owl:versionInfo "$@ $(TODAY)" \
+		--output $@
+.PRECIOUS: subsets/envo_test.owl
 
 release-diffs:
 	cd diffs && make
